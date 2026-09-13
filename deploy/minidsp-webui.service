@@ -5,6 +5,8 @@ Wants=minidsp.service
 
 [Service]
 Type=simple
+# /root/minidsp-webui is a placeholder - deploy/install.sh rewrites it to
+# wherever this checkout actually lives before installing this unit.
 WorkingDirectory=/root/minidsp-webui/backend
 ExecStart=/usr/bin/node dist/server.js
 Restart=on-failure

@@ -4,4 +4,6 @@ After=minidsp.service
 
 [Service]
 Type=oneshot
+# /root/minidsp-webui is a placeholder - deploy/install.sh rewrites it to
+# wherever this checkout actually lives before installing this unit.
 ExecStart=/root/minidsp-webui/deploy/minidspd-watchdog.sh
