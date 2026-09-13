@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the minidspd health-check watchdog every 2 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=2min
+Unit=minidspd-watchdog.service
+
+[Install]
+WantedBy=timers.target

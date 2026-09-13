@@ -1,0 +1,7 @@
+[Unit]
+Description=Health-check minidspd and restart it if unresponsive
+After=minidsp.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/minidsp-webui/deploy/minidspd-watchdog.sh

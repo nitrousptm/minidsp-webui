@@ -1,0 +1,19 @@
+[Unit]
+Description=minidsp-webui backend (custom miniDSP 2x4 HD console)
+After=network.target minidsp.service
+Wants=minidsp.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/minidsp-webui/backend
+ExecStart=/usr/bin/node dist/server.js
+Restart=on-failure
+RestartSec=2
+Environment=NODE_ENV=production
+Environment=PORT=5381
+Environment=HOST=0.0.0.0
+Environment=MINIDSP_HOST=127.0.0.1
+Environment=MINIDSP_PORT=5380
+
+[Install]
+WantedBy=multi-user.target
