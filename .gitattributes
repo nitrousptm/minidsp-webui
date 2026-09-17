@@ -1,0 +1,6 @@
+# Files that run on the Pi must keep LF even when checked out on Windows
+# (core.autocrlf=true), because deploy/sync.sh ships the working copy as-is.
+*.sh      text eol=lf
+*.rules   text eol=lf
+*.service text eol=lf
+*.timer   text eol=lf
