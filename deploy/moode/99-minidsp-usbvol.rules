@@ -1,0 +1,4 @@
+# When the miniDSP 2x4HD sound card (re)appears, restore the moOde volume knob
+# onto its USB volume control, which resets to 0 dB on every enumeration.
+# See minidsp-usbvol-restore.sh. Runs detached so udev never waits on it.
+ACTION=="add", SUBSYSTEM=="sound", KERNEL=="card*", ATTRS{idVendor}=="2752", ATTRS{idProduct}=="0011", RUN+="/usr/bin/systemd-run --no-block --collect --unit=minidsp-usbvol-restore-$env{SEQNUM} /usr/local/bin/minidsp-usbvol-restore.sh"

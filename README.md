@@ -59,7 +59,8 @@ This will:
 3. `npm install`, `npm test`, and `npm run build` for both `backend/` and `frontend/`
 4. Install and enable the `minidsp-webui` systemd service
 5. Install and enable `minidspd-watchdog` (see [Known issues](#known-issues) — minidsp-rs occasionally needs a kick)
-6. Run a read-only smoke test against the running service
+6. Only if a moOde database is found on the host: install the optional moOde USB volume restore hook (`deploy/moode/`, see [Optional moOde integration](#optional-moode-integration)); everything else works without moOde
+7. Run a read-only smoke test against the running service
 
 The console is then served at `http://<host>:5381` — the backend serves
 both the API and the built frontend from a single port.
@@ -155,6 +156,18 @@ editor. A full PEQ verify takes roughly 1–2 minutes (12 sweeps back to
 back); crossover verify takes 30–40 seconds (4 sweeps). The original
 configuration is always restored afterward, whether the sweep succeeds or
 is interrupted.
+
+## Optional moOde integration
+
+The 2x4 HD exposes a USB volume control (`miniDSP 2x4HD Playback Volume`,
+-127..0 dB). On a moOde host with the volume type set to *Hardware*, MPD
+drives that control, which makes the DSP the single volume point for the
+whole player. The catch: the control resets to 0 dB on every USB
+(re)enumeration and MPD does not push its value again. `deploy/moode/`
+contains a udev hook that restores moOde's knob position within a second of
+the device reappearing. `deploy/install.sh` installs it only when it finds
+moOde's database (`MOODE_VOLUME_HOOK=yes|no` overrides); nothing else in
+this project depends on moOde. Details in [deploy/moode/README.md](deploy/moode/README.md).
 
 ## Known issues
 

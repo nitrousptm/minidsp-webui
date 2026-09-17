@@ -47,6 +47,23 @@ cp "$PROJECT_DIR/deploy/minidspd-watchdog.timer" /etc/systemd/system/minidspd-wa
 systemctl daemon-reload
 systemctl enable --now minidspd-watchdog.timer
 
+# Optional, moOde only: re-apply moOde's volume knob to the 2x4 HD's USB volume
+# control after every USB (re)enumeration - it resets to 0 dB otherwise. See
+# deploy/moode/README.md. Auto-detected via moOde's database; override with
+# MOODE_VOLUME_HOOK=yes|no. Nothing else in this project depends on moOde.
+MOODE_VOLUME_HOOK="${MOODE_VOLUME_HOOK:-auto}"
+if [ "$MOODE_VOLUME_HOOK" = "auto" ]; then
+  if [ -f /var/local/www/db/moode-sqlite3.db ]; then MOODE_VOLUME_HOOK=yes; else MOODE_VOLUME_HOOK=no; fi
+fi
+if [ "$MOODE_VOLUME_HOOK" = "yes" ]; then
+  echo "==> moOde detected: installing USB volume restore hook (deploy/moode)"
+  install -m 755 "$PROJECT_DIR/deploy/moode/minidsp-usbvol-restore.sh" /usr/local/bin/minidsp-usbvol-restore.sh
+  install -m 644 "$PROJECT_DIR/deploy/moode/99-minidsp-usbvol.rules" /etc/udev/rules.d/99-minidsp-usbvol.rules
+  udevadm control --reload-rules
+else
+  echo "==> No moOde database found, skipping the moOde USB volume hook (MOODE_VOLUME_HOOK=yes to force)"
+fi
+
 echo "==> Waiting for backend to come up"
 sleep 2
 bash "$PROJECT_DIR/deploy/smoke-test.sh" http://127.0.0.1:5381 || {
