@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { MasterStatus, PresetSummary, Source } from '../types';
+import type { HostVolume, MasterStatus, PresetSummary, Source } from '../types';
 import { MASTER_VOLUME_RANGE } from '../types';
 
 const VOLUME_EPSILON = 0.05;
@@ -7,6 +7,7 @@ const PENDING_EDIT_TIMEOUT_MS = 4000;
 
 export function MasterBar({
   master,
+  hostVolume,
   presets,
   availableSources,
   onSourceChange,
@@ -16,6 +17,7 @@ export function MasterBar({
   onOpenPresetManager,
 }: {
   master: MasterStatus | null;
+  hostVolume?: HostVolume | null;
   presets: PresetSummary[];
   availableSources: Source[];
   onSourceChange: (source: Source) => void;
@@ -134,6 +136,20 @@ export function MasterBar({
         </button>
         <span className="slider-value">{volume.toFixed(1)} dB</span>
       </div>
+
+      {hostVolume && (
+        // A second, host-driven attenuator in front of the DSP (the 2x4 HD's
+        // USB volume, e.g. moOde's knob). Read-only here on purpose: the
+        // player owns it. Shown so the master slider isn't mistaken for the
+        // whole picture - the sum is what actually reaches the outputs.
+        <span
+          className="host-volume"
+          title={`${hostVolume.control} on host ALSA card ${hostVolume.card} (${hostVolume.raw}/${hostVolume.rawMax}). Set by the player on the host, not by this console. Total = USB + master.`}
+        >
+          USB {hostVolume.mute ? 'muted' : `${hostVolume.dB.toFixed(0)} dB`} · total{' '}
+          {hostVolume.mute || master?.mute ? 'muted' : `${(hostVolume.dB + volume).toFixed(1)} dB`}
+        </span>
+      )}
 
       <button className={`strip-button${master?.mute ? ' active-red' : ''}`} onClick={onMuteToggle}>
         {master?.mute ? 'MUTED' : 'MUTE'}

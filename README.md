@@ -104,6 +104,9 @@ All via environment variables, set in `deploy/minidsp-webui.service` or your own
 | `MINIDSP_ALSA_DEVICE` | `hw:CARD=m2x4HD,DEV=0` | ALSA device used for hardware-in-the-loop sweeps |
 | `HIL_SWEEP_DURATION_SEC` | `6` (prod) / `0.05` (mock) | Length of one hardware-in-the-loop sweep |
 | `HIL_SWEEP_POLL_INTERVAL_MS` | `40` (prod) / `5` (mock) | How often the level meter is sampled during a sweep |
+| `HOST_VOLUME` | `auto` | `off` hides the read-only USB volume readout (see [Optional moOde integration](#optional-moode-integration)) |
+| `HOST_VOLUME_CARD_MATCH` | `m2x4HD` | ALSA card id (from `/proc/asound/cards`) whose USB volume to read |
+| `HOST_VOLUME_CONTROL` | `miniDSP 2x4HD Playback Volume` | ALSA control name of that USB volume |
 
 ## Local development (no hardware needed)
 
@@ -168,6 +171,12 @@ contains a udev hook that restores moOde's knob position within a second of
 the device reappearing. `deploy/install.sh` installs it only when it finds
 moOde's database (`MOODE_VOLUME_HOOK=yes|no` overrides); nothing else in
 this project depends on moOde. Details in [deploy/moode/README.md](deploy/moode/README.md).
+
+Independently of moOde, the master bar shows that USB stage as a read-only
+readout ("USB −21 dB · total −31 dB") whenever the backend host has the 2x4 HD
+as an ALSA card, so the master slider is never mistaken for the whole
+picture. It is never written from here — the player on the host owns it.
+`HOST_VOLUME=off` hides it.
 
 ## Known issues
 

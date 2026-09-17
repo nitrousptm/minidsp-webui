@@ -6,6 +6,7 @@ import type {
   CrossoverBasicParams,
   DeviceConfigState,
   DeviceInfoResponse,
+  HostVolume,
   PeqBasicParams,
   PresetSummary,
   Source,
@@ -37,6 +38,7 @@ export function Dashboard() {
   const { status: liveStatus, stale: liveStatusStale } = useDeviceSocket();
   const [masterFallback, setMasterFallback] = useState<Awaited<ReturnType<typeof api.getMaster>> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hostVolume, setHostVolume] = useState<HostVolume | null>(null);
 
   async function refreshAll() {
     const [d, s, p, m] = await Promise.all([api.getDevice(), api.getState(), api.getPresets(), api.getMaster()]);
@@ -48,6 +50,28 @@ export function Dashboard() {
 
   useEffect(() => {
     refreshAll();
+  }, []);
+
+  // The host-side USB volume (if any) changes behind our back - a rotary
+  // encoder, a player's knob - and isn't part of minidspd's status stream,
+  // so poll it. Cheap: the backend caches the amixer read for a second.
+  useEffect(() => {
+    let cancelled = false;
+    async function poll() {
+      if (document.hidden) return;
+      try {
+        const v = await api.getHostVolume();
+        if (!cancelled) setHostVolume(v.available ? v : null);
+      } catch {
+        if (!cancelled) setHostVolume(null);
+      }
+    }
+    poll();
+    const timer = setInterval(poll, 2000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
   }, []);
 
   if (!device || !state) {
@@ -268,6 +292,7 @@ export function Dashboard() {
 
       <MasterBar
         master={master}
+        hostVolume={hostVolume}
         presets={presets}
         availableSources={device.layout.availableSources}
         onSourceChange={handleMasterSource}

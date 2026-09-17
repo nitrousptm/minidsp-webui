@@ -12,13 +12,21 @@ import { channelsRouter } from './routes/channels.js';
 import { presetsRouter } from './routes/presets.js';
 import { diagnosticsRouter } from './routes/diagnostics.js';
 import { attachWsRelay } from './wsRelay.js';
+import { hostVolumeRouter } from './routes/hostVolume.js';
+import { createHostVolumeReader, type HostVolumeReader } from './hostVolume.js';
 import type { MinidspClient } from './minidspClient.js';
 import { createTonePlayer, type TonePlayer } from './diagnostics/tonePlayer.js';
 
-export async function createApp(overrideClient?: MinidspClient, overrideStore?: ConfigStore, overrideTonePlayer?: TonePlayer) {
+export async function createApp(
+  overrideClient?: MinidspClient,
+  overrideStore?: ConfigStore,
+  overrideTonePlayer?: TonePlayer,
+  overrideHostVolume?: HostVolumeReader,
+) {
   const client = overrideClient ?? createMinidspClient();
   const store = overrideStore ?? new ConfigStore();
   const tonePlayer = overrideTonePlayer ?? createTonePlayer();
+  const hostVolume = overrideHostVolume ?? createHostVolumeReader();
   await store.whenReady();
 
   const app = express();
@@ -29,6 +37,7 @@ export async function createApp(overrideClient?: MinidspClient, overrideStore?: 
   app.use('/api', channelsRouter(client, store));
   app.use('/api', presetsRouter(client, store));
   app.use('/api', diagnosticsRouter(client, store, tonePlayer));
+  app.use('/api', hostVolumeRouter(hostVolume));
 
   const frontendDist = path.resolve(process.cwd(), '../frontend/dist');
   if (existsSync(frontendDist)) {

@@ -101,6 +101,23 @@ export interface StatusSummary {
   output_levels: number[];
 }
 
+/**
+ * The 2x4 HD's USB volume control as seen by the backend host (read-only).
+ * Sits in front of the DSP master volume and adds to it; only present when
+ * something on the host - e.g. moOde with hardware volume - can drive it.
+ */
+export interface HostVolume {
+  available: true;
+  card: number;
+  control: string;
+  raw: number;
+  rawMin: number;
+  rawMax: number;
+  dB: number;
+  mute: boolean | null;
+}
+export type HostVolumeResponse = HostVolume | { available: false };
+
 export interface DeviceInfoResponse {
   device: { product_name: string | null; version: { serial: number; fw_major: number; fw_minor: number } | null } | null;
   layout: {

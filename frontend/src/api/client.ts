@@ -7,6 +7,7 @@ import type {
   DeviceConfigState,
   DeviceInfoResponse,
   Fir,
+  HostVolumeResponse,
   PeqBasicParams,
   PeqVerifyResult,
   PresetSummary,
@@ -59,6 +60,7 @@ export const api = {
   updateFir: (index: number, patch: Partial<Fir>) => request<Fir>('PUT', `/api/outputs/${index}/fir`, patch),
 
   getPresets: () => request<PresetSummary[]>('GET', '/api/presets'),
+  getHostVolume: () => request<HostVolumeResponse>('GET', '/api/host-volume'),
   activatePreset: (index: number) => request('POST', `/api/presets/${index}/activate`),
   renamePreset: (index: number, name: string) => request('POST', `/api/presets/${index}/rename`, { name }),
   resetPreset: (index: number) => request('POST', `/api/presets/${index}/reset`),

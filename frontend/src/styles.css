@@ -362,3 +362,12 @@ button {
   font-size: 12px;
   color: var(--text-dim);
 }
+
+/* Read-only readout of the host-side USB volume stage in the master bar */
+.host-volume {
+  color: var(--text-dim);
+  font-size: 12px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+}
