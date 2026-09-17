@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Biquad, PeqFilterType } from '../../types';
+import { useContainerWidth } from '../../lib/useContainerWidth';
 import { biquadMagnitudeDb, combinedMagnitudeDb } from '../../lib/biquad';
 
 export interface ChartPoint {
@@ -53,7 +54,7 @@ export interface MeasuredCurve {
 export function FrequencyResponseChart({
   points,
   sampleRate,
-  width = 860,
+  width: maxWidth = 860,
   height = 320,
   onDragPoint,
   measuredCurves,
@@ -66,6 +67,9 @@ export function FrequencyResponseChart({
   measuredCurves?: MeasuredCurve[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Never wider than the box it sits in (phones), never wider than maxWidth (desktops).
+  const [wrapRef, wrapWidth] = useContainerWidth<HTMLDivElement>();
+  const width = wrapWidth ? Math.min(maxWidth, wrapWidth) : maxWidth;
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [hover, setHover] = useState<{ freq: number; db: number; x: number; y: number } | null>(null);
 
@@ -233,14 +237,15 @@ export function FrequencyResponseChart({
   }
 
   return (
-    <div className="chart-wrap">
+    <div className="chart-wrap" ref={wrapRef}>
       <canvas
         ref={canvasRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={() => setHover(null)}
-        style={{ display: 'block', cursor: dragIndex !== null ? 'grabbing' : 'crosshair' }}
+        // touch-action none: a finger on a handle drags the handle, not the page
+        style={{ display: 'block', touchAction: 'none', cursor: dragIndex !== null ? 'grabbing' : 'crosshair' }}
       />
     </div>
   );

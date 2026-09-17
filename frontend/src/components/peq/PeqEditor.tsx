@@ -148,6 +148,7 @@ export function PeqEditor({
         measuredCurves={measuredCurves}
       />
 
+      <div className="table-scroll">
       <table className="peq-table">
         <thead>
           <tr>
@@ -225,6 +226,7 @@ export function PeqEditor({
           })}
         </tbody>
       </table>
+      </div>
 
       {advancedIndex !== null && (
         <AdvancedBiquadEditor

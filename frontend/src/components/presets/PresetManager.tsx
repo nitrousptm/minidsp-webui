@@ -53,6 +53,8 @@ export function PresetManager({ onActivated }: { onActivated: () => void }) {
           </button>
         </div>
       )}
+      {/* five action buttons per row don't fit a phone; scroll the table, not the page */}
+      <div className="table-scroll">
       <table className="peq-table">
         <thead>
           <tr>
@@ -104,6 +106,7 @@ export function PresetManager({ onActivated }: { onActivated: () => void }) {
           ))}
         </tbody>
       </table>
+      </div>
 
       <div className="toolbar">
         <button className="small-btn" onClick={() => runAction(() => api.resetAllPresets())}>

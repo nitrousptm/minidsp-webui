@@ -58,7 +58,7 @@ button {
 
 .app-main {
   flex: 1;
-  padding: 12px 16px 90px;
+  padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -194,22 +194,25 @@ button {
   background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow) 80%, var(--accent-red) 95%);
 }
 
+/* Sticky rather than fixed: it still pins to the bottom of the viewport while
+   the page scrolls, but takes its real height in the layout - so when it wraps
+   onto two or three rows on a phone, nothing hides underneath it. */
 .master-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
+  position: sticky;
   bottom: 0;
   background: var(--panel);
   border-top: 1px solid var(--border);
-  padding: 10px 16px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 8px 16px;
   z-index: 10;
 }
 
 .preset-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -370,4 +373,64 @@ button {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   cursor: help;
+}
+
+/* Phones. Everything above is designed for a desktop/tablet; below ~600px the
+   strips go two-up instead of one long column, modals use the full width, and
+   the fixed-width inputs give way so nothing scrolls sideways. */
+@media (max-width: 600px) {
+  .app-main {
+    padding: 8px 8px 12px;
+    gap: 10px;
+  }
+
+  .header-bar {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 8px;
+  }
+
+  .strip-row {
+    gap: 8px;
+  }
+
+  .channel-strip {
+    /* two strips per row on any phone from 320px up */
+    width: auto;
+    flex: 1 1 calc(50% - 4px);
+    min-width: 148px;
+    padding: 8px;
+  }
+
+  .master-bar {
+    padding-left: 8px;
+    padding-right: 8px;
+    gap: 6px 10px;
+  }
+
+  .master-bar .slider-row {
+    /* the inline max-width keeps it from crowding the desktop bar; on a
+       phone it should take whatever the row has left */
+    max-width: none !important;
+    flex: 1 1 200px;
+  }
+
+  .modal-overlay {
+    padding: 6px;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  .peq-table th,
+  .peq-table td {
+    padding: 4px 2px;
+  }
+}
+
+/* Tables wider than a phone scroll inside their own box; the page never does. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }

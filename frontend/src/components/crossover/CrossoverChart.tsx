@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Biquad } from '../../types';
+import { useContainerWidth } from '../../lib/useContainerWidth';
 import { combinedMagnitudeDb } from '../../lib/biquad';
 
 const FREQ_MIN = 20;
@@ -53,7 +54,7 @@ export function CrossoverChart({
   curves,
   handles,
   sampleRate,
-  width = 860,
+  width: maxWidth = 860,
   height = 280,
   onDragHandle,
   measuredCurves,
@@ -67,6 +68,9 @@ export function CrossoverChart({
   measuredCurves?: MeasuredCurve[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Never wider than the box it sits in (phones), never wider than maxWidth (desktops).
+  const [wrapRef, wrapWidth] = useContainerWidth<HTMLDivElement>();
+  const width = wrapWidth ? Math.min(maxWidth, wrapWidth) : maxWidth;
   const [dragKind, setDragKind] = useState<CrossoverHandleKind | null>(null);
   const [hoverFreq, setHoverFreq] = useState<number | null>(null);
 
@@ -210,14 +214,15 @@ export function CrossoverChart({
   }
 
   return (
-    <div className="chart-wrap">
+    <div className="chart-wrap" ref={wrapRef}>
       <canvas
         ref={canvasRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={() => setHoverFreq(null)}
-        style={{ display: 'block', cursor: onDragHandle ? (dragKind !== null ? 'grabbing' : 'crosshair') : 'default' }}
+        // touch-action none: a finger on a handle drags the handle, not the page
+        style={{ display: 'block', touchAction: 'none', cursor: onDragHandle ? (dragKind !== null ? 'grabbing' : 'crosshair') : 'default' }}
       />
     </div>
   );
