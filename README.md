@@ -162,21 +162,34 @@ is interrupted.
 
 ## Optional moOde integration
 
-The 2x4 HD exposes a USB volume control (`miniDSP 2x4HD Playback Volume`,
--127..0 dB). On a moOde host with the volume type set to *Hardware*, MPD
-drives that control, which makes the DSP the single volume point for the
-whole player. The catch: the control resets to 0 dB on every USB
-(re)enumeration and MPD does not push its value again. `deploy/moode/`
-contains a udev hook that restores moOde's knob position within a second of
-the device reappearing. `deploy/install.sh` installs it only when it finds
-moOde's database (`MOODE_VOLUME_HOOK=yes|no` overrides); nothing else in
-this project depends on moOde. Details in [deploy/moode/README.md](deploy/moode/README.md).
+Nothing here needs moOde, but a moOde-based streamer with the 2x4 HD on USB
+can be turned into a complete player around this console. `deploy/moode/`
+documents and ships the pieces; none of them is a dependency of the web UI:
 
-Independently of moOde, the master bar shows that USB stage as a read-only
-readout ("USB −21 dB · total −31 dB") whenever the backend host has the 2x4 HD
-as an ALSA card, so the master slider is never mistaken for the whole
-picture. It is never written from here — the player on the host owns it.
-`HOST_VOLUME=off` hides it.
+- **Volume in the DSP, safely.** With moOde's volume type set to *Hardware*,
+  MPD drives the 2x4 HD's USB volume control (`miniDSP 2x4HD Playback
+  Volume`, -127..0 dB) — bit-perfect USB stream, one level for every source.
+  The catch: that control resets to 0 dB on every USB (re)enumeration and MPD
+  does not push its value again. A udev hook restores moOde's knob position
+  within a second of the device reappearing. `deploy/install.sh` installs it
+  only when it finds moOde's database (`MOODE_VOLUME_HOOK=yes|no` overrides).
+  [deploy/moode/README.md](deploy/moode/README.md)
+- **Rotary encoder** — a physical volume knob with push button, wiring and
+  moOde setup, plus a patch for moOde's `rotenc.py` that stops the volume
+  from jumping backwards with common encoders.
+  [deploy/moode/rotary-encoder.md](deploy/moode/rotary-encoder.md)
+- **IR remote** — a 38 kHz receiver on a GPIO, decoded by the kernel (no
+  LIRC), keys mapped to volume, transport and DSP preset selection through
+  this backend's API. Receiver choice, wiring, keymap and `triggerhappy`
+  setup, with the miniDSP remote as worked example.
+  [deploy/moode/ir-remote.md](deploy/moode/ir-remote.md)
+
+Independently of moOde, the master bar shows the USB volume stage as a
+read-only readout ("USB −21 dB · total −31 dB") whenever the backend host has
+the 2x4 HD as an ALSA card, so the master slider is never mistaken for the
+whole picture. It is never written from here — the player on the host owns
+it. `HOST_VOLUME=off` hides it. Preset changes made from outside the browser
+(the remote, a second browser) are picked up from minidspd's live status.
 
 ## Known issues
 

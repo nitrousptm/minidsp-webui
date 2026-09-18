@@ -1,0 +1,23 @@
+# Kernel rc-core keymap for the miniDSP IR remote (the SHD-style one with
+# transport keys). Install as /etc/rc_keymaps/minidsp-remote.toml and
+# register it in /etc/rc_maps.cfg - see ../ir-remote.md. Scancodes were read
+# with `ir-keytable -c -p all -t`; the key names are deliberately ones that
+# neither Chromium (the moOde display) nor systemd-logind act on.
+[[protocols]]
+name = "minidsp-remote"
+protocol = "nec"
+
+[protocols.scancodes]
+0x350a = "KEY_VOLUMEUP"
+0x3509 = "KEY_VOLUMEDOWN"
+0x350c = "KEY_MUTE"
+0x3543 = "KEY_PLAYPAUSE"
+0x3542 = "KEY_NEXTSONG"
+0x3541 = "KEY_PREVIOUSSONG"
+0x3540 = "KEY_STOP"
+0x3501 = "KEY_PROG1"
+0x3502 = "KEY_PROG2"
+0x3505 = "KEY_PROG3"
+0x3500 = "KEY_PROG4"
+0x350e = "KEY_SOUND"
+0x3506 = "KEY_CONFIG"
