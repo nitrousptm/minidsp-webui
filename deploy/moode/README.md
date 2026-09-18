@@ -85,6 +85,7 @@ deploy/moode/
   ir-remote.md                 receiver hardware, kernel/keymap/triggerhappy setup
   ir/minidsp-remote.toml       keymap for the miniDSP remote (adapt scancodes)
   ir/minidsp-remote.conf       triggerhappy actions for it
+  ir/61-ir-repeat.rules        udev rule: slower key auto-repeat (fewer DB writes)
   minidsp-usbvol-restore.sh    USB volume restore hook
   99-minidsp-usbvol.rules      udev rule that triggers it
 ```

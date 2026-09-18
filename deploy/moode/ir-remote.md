@@ -189,6 +189,21 @@ To load the map at boot, add as the first line of `/etc/rc_maps.cfg`
 The udev rule shipped with `ir-keytable` applies this file whenever the
 device appears.
 
+**Auto-repeat rate.** The kernel repeats a held key every 125 ms after a
+500 ms delay. With the volume keys that means eight `vol.sh` runs per
+second - each one a write to moOde's SQLite database on the SD card, and
+under I/O pressure (a struggling Wi-Fi driver shares the SD card's interrupt
+on the Pi 4) they queue up and the knob lags. 250 ms is plenty for a volume
+ramp. Try it live with `ir-keytable -D 400 -P 250`; to make it permanent,
+[ir/61-ir-repeat.rules](ir/61-ir-repeat.rules) sets it whenever the
+receiver appears:
+
+```bash
+install -m 644 deploy/moode/ir/61-ir-repeat.rules /etc/udev/rules.d/
+udevadm control --reload-rules && udevadm trigger -s rc -c add
+ir-keytable -s rc0 | grep -i repeat
+```
+
 ### 4. Actions: key name → command
 
 [ir/minidsp-remote.conf](ir/minidsp-remote.conf) is the matching

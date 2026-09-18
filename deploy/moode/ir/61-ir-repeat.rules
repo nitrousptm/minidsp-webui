@@ -1,0 +1,4 @@
+# Slower auto-repeat for the IR receiver (gpio-ir on GPIO 25): the kernel
+# default (500 ms delay, 125 ms period) makes a held volume key run vol.sh -
+# and its sqlite write - 8x per second. 250 ms is plenty for a volume ramp.
+ACTION=="add", SUBSYSTEM=="rc", KERNEL=="rc*", DRIVERS=="gpio_ir_recv", RUN+="/usr/bin/ir-keytable -s $name -D 400 -P 250"
