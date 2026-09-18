@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api/client';
 import { useDeviceSocket } from '../api/useDeviceSocket';
 import type {
@@ -51,6 +51,25 @@ export function Dashboard() {
   useEffect(() => {
     refreshAll();
   }, []);
+
+  // A preset switched by someone else - an IR remote hitting the API, a
+  // second browser on the phone - only shows up as a changed master.preset
+  // in minidspd's live status. Re-sync tabs and channel state from the
+  // backend when that happens. Keyed on *changes* of the live value (not on
+  // every mismatch), so a backend/device disagreement can't trigger an
+  // endless refresh loop. Note the real minidspd sends master fields only
+  // when something changed, not on a schedule: in steady state the very
+  // first populated frame IS the change, so it must not be skipped as an
+  // "initial" one - the comparison against the backend's active preset is
+  // what decides whether a refresh is needed.
+  const livePreset =
+    liveStatus?.master && Object.keys(liveStatus.master).length > 0 ? liveStatus.master.preset : undefined;
+  const lastLivePreset = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (livePreset === undefined || livePreset === lastLivePreset.current) return;
+    lastLivePreset.current = livePreset;
+    if (presets.find((p) => p.active)?.index !== livePreset) refreshAll();
+  }, [livePreset]);
 
   // The host-side USB volume (if any) changes behind our back - a rotary
   // encoder, a player's knob - and isn't part of minidspd's status stream,
